@@ -47,16 +47,6 @@ st.markdown("""
             border: 1px solid #64748B !important;
             border-radius: 8px !important;
         }
-        .author-badge {
-            display: inline-block;
-            background: rgba(0, 0, 0, 0.65);
-            padding: 7px 18px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            color: #F1F5F9;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            margin-bottom: 15px;
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -105,20 +95,20 @@ def audio_button(text):
     """
     components.html(html_code, height=42)
 
-# Asosiy menyu bo'limlari (Matnlar alohida menyu sifatida qo'shildi)
+# Asosiy menyu (Matnlar 3-o'ringa o'tkazildi)
 asosiy_menyu = st.sidebar.radio(
     "Bo'limni tanlang:",
     [
-        "📚 50 ta Bob Matnlari (Reading & Audio)",
         "📖 1000 ta so'z (Lug'at va Testlar)",
-        "🧮 Matematika Trenajori"
+        "🧮 Matematika Trenajori",
+        "📚 50 ta Bob Matnlari (Reading & Audio)"
     ]
 )
 
 st.sidebar.markdown("---")
 st.sidebar.info("✨ **Tuzuvchi:**\nQuljanova Shukurjon Zaribovna")
 
-# BARCHA 50 TA BOBNING 30-40 SO'ZLIK UNIKAL MATNLARI BAZASI
+# BARCHA 50 TA BOBNING 30-40 SO'ZLIK MATNLARI BAZASI
 MATNLAR_BAZASI = {
     1: {
         "mavzu": "People & Family — Oila a'zolari",
@@ -222,7 +212,6 @@ MATNLAR_BAZASI = {
     }
 }
 
-# 21-bobdan 50-bobgacha avtomatik unikal matnlar to'ldiriladi
 for b in range(21, 51):
     if b not in MATNLAR_BAZASI:
         mavzular_guruhi = "Education & Career" if b <= 25 else ("Travel & Transport" if b <= 30 else ("Health & Body" if b <= 35 else ("Technology & Digital" if b <= 40 else ("Emotions & Mindset" if b <= 45 else "Society & Environment"))))
@@ -233,56 +222,11 @@ for b in range(21, 51):
         }
 
 # =========================================================================
-# 1-ALOHIDA BO'LIM: 50 TA BOB MATNLARI (READING & AUDIO)
+# 1-BO'LIM: 1000 TA SO'Z (LUG'AT, YOZMA MASHQLAR VA TEST)
 # =========================================================================
-if asosiy_menyu == "📚 50 ta Bob Matnlari (Reading & Audio)":
-    st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
-    st.title("📚 50 ta Bobning Maxsus Matnlari (Reading & Audio)")
-    st.caption("Har bir bobdagi yangi so'zlardan tuzilgan 30–40 so'zlik matnlar, o'zbekcha tarjimasi va toza audio talaffuz")
-
-    # Bob tanlash
-    bob_tanlov = st.selectbox(
-        "Qaysi bob matnini o'qimoqchisiz?",
-        [f"{i}-Bob: {MATNLAR_BAZASI[i]['mavzu']}" for i in range(1, 51)]
-    )
-    tanlangan_raqam = int(bob_tanlov.split("-")[0])
-    matn_obj = MATNLAR_BAZASI[tanlangan_raqam]
-
-    st.markdown("---")
-
-    # Matn kartochkasi
-    st.markdown(f"""
-        <div class="custom-card">
-            <h3 style="color: #60A5FA; margin-bottom: 5px;">📖 {bob_tanlov}</h3>
-            <p style="color: #94A3B8; font-size: 14px;">Mavzu yo'nalishi: <b>{matn_obj['mavzu']}</b></p>
-        </div>
-    """, unsafe_allow_html=True)
-
-    c_matn, c_ovoz = st.columns([5, 1])
-    with c_matn:
-        st.markdown(f"#### 🇬🇧 English text (30–40 words):")
-        st.markdown(f"### *\"{matn_obj['en']}\"*")
-    with c_ovoz:
-        st.write("Talaffuz:")
-        audio_button(matn_obj['en'])
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("---")
-
-    st.markdown("#### 🇺🇿 O'zbekcha aniq tarjimasi:")
-    st.markdown(f"### *\"{matn_obj['uz']}\"*")
-
-    # Bobdagi so'zlar soni statistikasi
-    sozlar_soni = len(matn_obj['en'].split())
-    st.info(f"📊 Ushbu matn jami **{sozlar_soni} ta** inglizcha so'zdan iborat.")
-
-# =========================================================================
-# 2-BO'LIM: 1000 TA SO'Z (LUG'AT, YOZMA MASHQLAR VA TEST)
-# =========================================================================
-elif asosiy_menyu == "📖 1000 ta so'z (Lug'at va Testlar)":
-    st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
+if asosiy_menyu == "📖 1000 ta so'z (Lug'at va Testlar)":
     st.title("📖 1000 ta so'z — Lug'at, Yozma Mashqlar va Test")
-    st.caption("20 tadan so'z, audio, tarjima mashqlari va Excel hisoboti")
+    st.caption("20 tadan so'z, audio, to'liq yozma tarjima va Excel hisoboti")
 
     bob_nomlari = [f"{i}-Bob" for i in range(1, 51)]
     tanlangan_bob = st.sidebar.selectbox("O'rganish uchun Bobni tanlang:", bob_nomlari)
@@ -486,10 +430,9 @@ elif asosiy_menyu == "📖 1000 ta so'z (Lug'at va Testlar)":
             )
 
 # =========================================================================
-# 3-BO'LIM: MATEMATIKA TRENAJORI
+# 2-BO'LIM: MATEMATIKA TRENAJORI
 # =========================================================================
-else:
-    st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
+elif asosiy_menyu == "🧮 Matematika Trenajori":
     st.title("🧮 Matematika Trenajori")
     
     if "math_step" not in st.session_state:
@@ -581,3 +524,43 @@ else:
             st.session_state.math_score = 0
             st.session_state.math_total = 0
             st.rerun()
+
+# =========================================================================
+# 3-BO'LIM: 50 TA BOB MATNLARI (READING & AUDIO)
+# =========================================================================
+else:
+    st.title("📚 50 ta Bobning Maxsus Matnlari (Reading & Audio)")
+    st.caption("Har bir bobdagi yangi so'zlardan tuzilgan 30–40 so'zlik matnlar, o'zbekcha tarjimasi va toza audio talaffuz")
+
+    bob_tanlov = st.selectbox(
+        "Qaysi bob matnini o'qimoqchisiz?",
+        [f"{i}-Bob: {MATNLAR_BAZASI[i]['mavzu']}" for i in range(1, 51)]
+    )
+    tanlangan_raqam = int(bob_tanlov.split("-")[0])
+    matn_obj = MATNLAR_BAZASI[tanlangan_raqam]
+
+    st.markdown("---")
+
+    st.markdown(f"""
+        <div class="custom-card">
+            <h3 style="color: #60A5FA; margin-bottom: 5px;">📖 {bob_tanlov}</h3>
+            <p style="color: #94A3B8; font-size: 14px;">Mavzu yo'nalishi: <b>{matn_obj['mavzu']}</b></p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    c_matn, c_ovoz = st.columns([5, 1])
+    with c_matn:
+        st.markdown(f"#### 🇬🇧 English text (30–40 words):")
+        st.markdown(f"### *\"{matn_obj['en']}\"*")
+    with c_ovoz:
+        st.write("Talaffuz:")
+        audio_button(matn_obj['en'])
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("---")
+
+    st.markdown("#### 🇺🇿 O'zbekcha aniq tarjimasi:")
+    st.markdown(f"### *\"{matn_obj['uz']}\"*")
+
+    sozlar_soni = len(matn_obj['en'].split())
+    st.info(f"📊 Ushbu matn jami **{sozlar_soni} ta** inglizcha so'zdan iborat.")
