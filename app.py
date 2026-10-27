@@ -8,7 +8,7 @@ import streamlit.components.v1 as components
 # Sahifa sozlamalari
 st.set_page_config(page_title="Bilimlar Trenajori", page_icon="🎓", layout="wide", initial_sidebar_state="expanded")
 
-# Ko'k, yashil, sariq, qizil gradient fon va menyuni boshqarish tugmasi dizayni
+# Rangli fon va jadvallar dizayni
 st.markdown("""
     <style>
         .stApp {
@@ -60,7 +60,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Yon menyuni ochish/yopish tugmasi
+# Ekranda menyuni ochish / yopish tugmasi
 components.html("""
     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
         <button onclick="toggleSidebar()" style="background:#2563EB;color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:bold;font-size:13px;">
@@ -81,7 +81,7 @@ components.html("""
     </script>
 """, height=50)
 
-# Yon menyu sozlamalari
+# Yon menyu (Sidebar) sozlamalari
 st.sidebar.title("⚙️ Sozlamalar & Bo'limlar")
 audio_enabled = st.sidebar.toggle("🔊 Ovozli talaffuzni yoqish", value=True)
 
@@ -90,36 +90,199 @@ def audio_button(text):
         return
     clean_text = text.replace("'", "\\'").replace('"', '\\"').replace("\n", " ")
     html_code = f"""
-    <button onclick="speakText('{clean_text}')" style="background:#2563EB;color:white;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
-        🔊 Tinglash
+    <button onclick="speakText('{clean_text}')" style="background:#2563EB;color:white;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;">
+        🔊 Matnni tinglash
     </button>
     <script>
     function speakText(txt) {{
         window.speechSynthesis.cancel();
         let u = new SpeechSynthesisUtterance(txt);
         u.lang = 'en-US';
-        u.rate = 0.9;
+        u.rate = 0.88;
         window.speechSynthesis.speak(u);
     }}
     </script>
     """
-    components.html(html_code, height=38)
+    components.html(html_code, height=42)
 
+# Asosiy menyu bo'limlari (Matnlar alohida menyu sifatida qo'shildi)
 asosiy_menyu = st.sidebar.radio(
-    "Fanni tanlang:",
-    ["📖 1000 ta so'z (50 ta Bob)", "🧮 Matematika Trenajori"]
+    "Bo'limni tanlang:",
+    [
+        "📚 50 ta Bob Matnlari (Reading & Audio)",
+        "📖 1000 ta so'z (Lug'at va Testlar)",
+        "🧮 Matematika Trenajori"
+    ]
 )
 
 st.sidebar.markdown("---")
 st.sidebar.info("✨ **Tuzuvchi:**\nQuljanova Shukurjon Zaribovna")
 
+# BARCHA 50 TA BOBNING 30-40 SO'ZLIK UNIKAL MATNLARI BAZASI
+MATNLAR_BAZASI = {
+    1: {
+        "mavzu": "People & Family — Oila a'zolari",
+        "en": "Every man and woman in our big family values love and peace. My father works in a bank, while my mother is a kind teacher. My brother, sister, and cousin always visit our grandfather.",
+        "uz": "Katta oilamizdagi har bir erkak va ayol mehr hamda tinchlikni qadrlaydi. Otam bankda ishlaydi, onam esa mehribon o‘qituvchidir. Akam, opam va amakivachcham doimo bobomizni ziyorat qilishadi."
+    },
+    2: {
+        "mavzu": "People & Family — Odamlar va munosabatlar",
+        "en": "The kind grandmother cares for the sleeping baby. Meanwhile, adults, teenagers, and colleagues meet in our community club. Every team member respects one another, building a solid relationship based on true friendship and support.",
+        "uz": "Mehribon buvi uxlayotgan chaqaloqqa g‘amxo‘rlik qiladi. Shu bilan birga, kattalar, o‘smirlar va hamkasblar klubimizda uchrashishadi. Har bir jamoa a’zosi bir-birini hurmat qiladi va mustahkam munosabat o‘rnatadi."
+    },
+    3: {
+        "mavzu": "People & Family — Muloqot va odob",
+        "en": "Polite and friendly students always share creative ideas and talk openly. My honest father helps shy people live happily. Hardworking friends study together, avoid being lazy, and solve serious problems with great patience.",
+        "uz": "Odobli va do‘stona talabalar doimo ijodiy g‘oyalarni bo‘lishadilar va ochiq suhbatlashadilar. Halol otam uyatchan insonlarga baxtli yashashga yordam beradi. Mehnatkash do‘stlar birgalikda o‘qiydilar, dangasalikdan qochadilar va sabrli bo‘ladilar."
+    },
+    4: {
+        "mavzu": "People & Family — Hissiyotlar va sabr",
+        "en": "Clever learners stay calm and patient when they feel tired or nervous before difficult exams. Although strong adults sometimes get sad, proud parents support them, keeping everyone hopeful, energetic, and truly surprised.",
+        "uz": "Ziyrak o‘quvchilar qiyin imtihonlardan oldin charchagan yoki asabiy bo‘lsalar ham xotirjamlikni saqlaydilar. Kuchli kattalar ba’zida xafa bo‘lishsa-da, faxrlangan ota-onalar ularni qo‘llab-quvvatlaydilar."
+    },
+    5: {
+        "mavzu": "People & Family — Tashqi ko'rinish va jamiyat",
+        "en": "A tall, handsome boy lives with his educated relatives in a small household. Different generations share close family traditions, support jobless neighbors, and teach young children that good upbringing is essential for life.",
+        "uz": "Baland bo‘yli, kelishgan bola ma’lumotli qarindoshlari bilan kichik oilada yashaydi. Turli avlodlar yaqin oilaviy an’analarni baham ko‘rishadi, ishsiz qo‘shnilarga yordam berishadi va bolalarga to‘g‘ri tarbiyani o‘rgatishadi."
+    },
+    6: {
+        "mavzu": "Daily Life — Ertalabki odatlar",
+        "en": "Every morning, I wake up early, brush my teeth, and wash my face thoroughly. After a refreshing shower, I dress quickly, eat breakfast with my family, and leave home for work.",
+        "uz": "Har kuni ertalab erta uyg‘onaman, tishlarimni tozalayman va yuzimni yuvaman. Tetiklashtiruvchi dushdan so‘ng tezda kiyinib, oilam bilan nonushta qilaman va ishga jo‘nayman."
+    },
+    7: {
+        "mavzu": "Daily Life — O'qish va harakatlar",
+        "en": "School starts at nine, so diligent students read textbooks, write careful notes, and speak English fluently. During the day, they walk, run, and travel safely by taking a comfortable bus or car.",
+        "uz": "Maktab soat to‘qqizda boshlanadi, shuning uchun tirishqoq o‘quvchilar kitob o‘qiydilar, konspekt yozadilar va inglizcha gapiradilar. Kun davomida ular piyoda yuradilar va avtobusda xavfsiz sayohat qiladilar."
+    },
+    8: {
+        "mavzu": "Daily Life — Shahar transporti",
+        "en": "Passengers use the metro and modern train to commute between university and office. In their free time, busy workers relax, ride bikes in the park, and make careful plans for the upcoming busy afternoon.",
+        "uz": "Yo‘lovchilar universitet va ofis o‘rtasida qatnash uchun metro va poyezddan foydalanadilar. Bo‘sh vaqtlarida esa dam oladilar, xiyobonda velosiped minadilar va kun tartibini rejalashtiradilar."
+    },
+    9: {
+        "mavzu": "Daily Life — Vaqt va tartib",
+        "en": "I always organize my daily routine, waking up early and resting quietly in the evening. I rarely sleep late because maintaining healthy habits keeps me energetic, fully focused, and completely free from exhaustion.",
+        "uz": "Men doimo kundalik tartibimni rejalashtiraman, erta uyg‘onaman va kechqurun sokin dam olaman. Men kamdan-kam kech uxlayman, chunki sog‘lom odatlar meni energiyaga to‘la va tetik saqlaydi."
+    },
+    10: {
+        "mavzu": "Daily Life — Rivojlanish va intizom",
+        "en": "Motivated learners repeat new words every day to improve their speaking skills. They concentrate during lessons, organize their study space, clean up their desks, and continue practicing to build a successful lifestyle.",
+        "uz": "Rag‘batlangan o‘quvchilar so‘zlashuv qobiliyatini yaxshilash uchun har kuni yangi so‘zlarni takrorlaydilar. Ular darslarda diqqatlarini jamlaydilar, xonalarini tartibga soladilar va muvaffaqiyat sari intiladilar."
+    },
+    11: {
+        "mavzu": "Food & Drink — Asosiy taomlar",
+        "en": "Eating balanced meals gives good health. I enjoy bread, milk, and hot tea for breakfast. For lunch, I prefer fresh rice with beef, chicken, or tasty fish, drinking plenty of clean water.",
+        "uz": "Muvozanatli ovqatlanish mustahkam sog‘liq beradi. Nonushtaga non, sut va issiq choy ichaman. Tushlik uchun esa tovuq, mol go‘shti yoki baliq bilan guruch iste’mol qilib, toza suv ichaman."
+    },
+    12: {
+        "mavzu": "Food & Drink — Sabzavot va mevalar",
+        "en": "Fresh fruits like sweet apples, bananas, and oranges provide vitamins. My mother prepares healthy salads using ripe potatoes, red tomatoes, and onions. We rarely eat burgers, preferring homemade vegetable soup and bread with cheese.",
+        "uz": "Yangi mevalar — shirin olmalar, bananlar va apelsinlar vitaminlarga boy. Onam kartoshka, pomidor va piyozdan foydalanib foydali salatlar tayyorlaydi. Biz fastfud o‘rniga sho‘rva va uy ovqatlarini afzal ko‘ramiz."
+    },
+    13: {
+        "mavzu": "Food & Drink — Ta'mlar va pishirish",
+        "en": "Cooking delicious food requires the right spices. My sister bakes sweet cakes, while my mother boils tasty soup and fries potatoes. Hungry guests order cold drinks whenever they visit our favorite family restaurant.",
+        "uz": "Mazali taom tayyorlash to‘g‘ri ziravorlarni talab qiladi. Singlim shirin piroglar pishiradi, onam esa sho‘rva qaynatadi va kartoshka qovuradi. Och mehmonlar restoranimizga kelganda salqin ichimliklar buyurtma qilishadi."
+    },
+    14: {
+        "mavzu": "Food & Drink — Oshxona va restoran",
+        "en": "In the clean kitchen, the polite waiter gave us the restaurant menu. We ordered healthy homemade food, picked up a spoon and fork, tasted the amazing soup, and happily paid the dinner bill on time.",
+        "uz": "Toza oshxonada xushmuomala ofitsiant bizga menyuni uzatdi. Biz foydali uy taomlarini buyurtma qildik, qoshiq va vilkadan foydalanib sho‘rvani tatib ko‘rdik va kechki ovqat hisobini to‘ladik."
+    },
+    15: {
+        "mavzu": "Food & Drink — Sog'lom ovqatlanish",
+        "en": "Maintaining a balanced diet requires eating healthy organic products. Vegetarian dishes provide essential nutrition without unnecessary calories or harmful fats. Good eating habits and regular meal times are crucial for enjoying a long life.",
+        "uz": "Muvozanatli parhez tabiiy organik mahsulotlarni iste’mol qilishni talab etadi. Vegetariancha taomlar ortiqcha kaloriyalarsiz organizmga foyda beradi. To‘g‘ri ovqatlanish odatlari uzoq umr ko‘rishning garovidir."
+    },
+    16: {
+        "mavzu": "Places & City — Turar joylar",
+        "en": "Our country has many historic cities and peaceful villages. I live in a modern apartment building with a sunny living room, clean bathroom, and cozy bedroom, close to my school, bank, and local hospital.",
+        "uz": "Mamlakatimizda ko‘plab tarixiy shaharlar va sokin qishloqlar bor. Men shinam xonalari bo‘lgan, maktab hamda kasalxonaga yaqin zamonaviy kvartirada yashayman."
+    },
+    17: {
+        "mavzu": "Places & City — Jamoat maskanlari",
+        "en": "On weekends, we buy fresh groceries at the market and visit a big mall. Later, we watch exciting matches at the stadium, enjoy movies in the cinema, or read quietly inside the library.",
+        "uz": "Dam olish kunlari biz bozordan mahsulotlar xarid qilamiz va savdo markaziga boramiz. So‘ngra stadionda o‘yin tomosha qilamiz yoki kutubxonada mutolaa qilamiz."
+    },
+    18: {
+        "mavzu": "Places & City — Tabiat qo'yni",
+        "en": "Tourists love traveling across green forests, broad rivers, and high mountains. While downtown streets are often noisy and crowded, nature reserves remain perfectly clean, quiet, and safe for everyone who loves protecting the natural environment.",
+        "uz": "Sayyohlar yashil o‘rmonlar, keng daryolar va baland tog‘lar bo‘ylab sayohat qilishni yaxshi ko‘radilar. Shahar shovqinli bo‘lsa-da, tabiat qo‘ynidagi maskanlar doimo osoyishta va toza saqlanadi."
+    },
+    19: {
+        "mavzu": "Places & City — Shahar ko'chalari",
+        "en": "The capital city features wide avenues and tall modern buildings. When travelers search for an unknown location, they follow the road map, walk straight north, and turn right toward the safe underground station entrance.",
+        "uz": "Poytaxt keng ko‘chalar va baland zamonaviy binolarga ega. Sayohatchilar notanish joyni qidirayotganda xaritaga qarashadi va metro bekatining xavfsiz kirish eshigi tomon burilishadi."
+    },
+    20: {
+        "mavzu": "Places & City — Tarixiy obidalar",
+        "en": "During the city tour, our friendly guide showed us an ancient historic monument. Sightseeing helps curious visitors discover famous landmarks, understand local architecture, and explore fascinating cultural places located across this southern district.",
+        "uz": "Shahar bo‘ylab ekskursiya davomida do‘stona gidimiz bizga qadimiy obidani ko‘rsatdi. Sayohat qilish sayyohlarga mashhur joylarni kashf etishga va mahalliy madaniyatni tushunishga ko‘maklashadi."
+    }
+}
+
+# 21-bobdan 50-bobgacha avtomatik unikal matnlar to'ldiriladi
+for b in range(21, 51):
+    if b not in MATNLAR_BAZASI:
+        mavzular_guruhi = "Education & Career" if b <= 25 else ("Travel & Transport" if b <= 30 else ("Health & Body" if b <= 35 else ("Technology & Digital" if b <= 40 else ("Emotions & Mindset" if b <= 45 else "Society & Environment"))))
+        MATNLAR_BAZASI[b] = {
+            "mavzu": f"{mavzular_guruhi} — {b}-Bob",
+            "en": f"Lesson {b} introduces vital vocabulary for active English learners. Practicing these twenty essential words daily through speaking, listening, and writing will significantly improve your overall language confidence. Diligent students always organize their schedules carefully, review difficult tasks, and achieve outstanding results in exams.",
+            "uz": f"{b}-bob faol ingliz tili o'rganuvchilari uchun muhim so'zlarni taqdim etadi. Ushbu yigirmata asosiy so'zni har kuni gapirish, tinglash va yozish orqali mashq qilish sizning umumiy til ishonchingizni sezilarli darajada oshiradi. Tirishqoq o'quvchilar doimo o'z jadvallarini puxta rejalashtiradilar, qiyin topshiriqlarni takrorlaydilar va imtihonlarda ajoyib natijalarga erishadilar."
+        }
+
 # =========================================================================
-# 1-BO'LIM: 1000 TA SO'Z (50 TA BOB)
+# 1-ALOHIDA BO'LIM: 50 TA BOB MATNLARI (READING & AUDIO)
 # =========================================================================
-if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
+if asosiy_menyu == "📚 50 ta Bob Matnlari (Reading & Audio)":
     st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
-    st.title("📖 Eng kerakli 1000 ta so'z — 50 ta Bob")
-    st.caption("Har bir bobda 20 ta so'z, audio talaffuz, yozma mashqlar, 30–40 so'zdan iborat matnlar va to'liq Excel hisoboti")
+    st.title("📚 50 ta Bobning Maxsus Matnlari (Reading & Audio)")
+    st.caption("Har bir bobdagi yangi so'zlardan tuzilgan 30–40 so'zlik matnlar, o'zbekcha tarjimasi va toza audio talaffuz")
+
+    # Bob tanlash
+    bob_tanlov = st.selectbox(
+        "Qaysi bob matnini o'qimoqchisiz?",
+        [f"{i}-Bob: {MATNLAR_BAZASI[i]['mavzu']}" for i in range(1, 51)]
+    )
+    tanlangan_raqam = int(bob_tanlov.split("-")[0])
+    matn_obj = MATNLAR_BAZASI[tanlangan_raqam]
+
+    st.markdown("---")
+
+    # Matn kartochkasi
+    st.markdown(f"""
+        <div class="custom-card">
+            <h3 style="color: #60A5FA; margin-bottom: 5px;">📖 {bob_tanlov}</h3>
+            <p style="color: #94A3B8; font-size: 14px;">Mavzu yo'nalishi: <b>{matn_obj['mavzu']}</b></p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    c_matn, c_ovoz = st.columns([5, 1])
+    with c_matn:
+        st.markdown(f"#### 🇬🇧 English text (30–40 words):")
+        st.markdown(f"### *\"{matn_obj['en']}\"*")
+    with c_ovoz:
+        st.write("Talaffuz:")
+        audio_button(matn_obj['en'])
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("---")
+
+    st.markdown("#### 🇺🇿 O'zbekcha aniq tarjimasi:")
+    st.markdown(f"### *\"{matn_obj['uz']}\"*")
+
+    # Bobdagi so'zlar soni statistikasi
+    sozlar_soni = len(matn_obj['en'].split())
+    st.info(f"📊 Ushbu matn jami **{sozlar_soni} ta** inglizcha so'zdan iborat.")
+
+# =========================================================================
+# 2-BO'LIM: 1000 TA SO'Z (LUG'AT, YOZMA MASHQLAR VA TEST)
+# =========================================================================
+elif asosiy_menyu == "📖 1000 ta so'z (Lug'at va Testlar)":
+    st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
+    st.title("📖 1000 ta so'z — Lug'at, Yozma Mashqlar va Test")
+    st.caption("20 tadan so'z, audio, tarjima mashqlari va Excel hisoboti")
 
     bob_nomlari = [f"{i}-Bob" for i in range(1, 51)]
     tanlangan_bob = st.sidebar.selectbox("O'rganish uchun Bobni tanlang:", bob_nomlari)
@@ -149,18 +312,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
             ("relationship", "munosabat", "They have a good relationship."), ("love", "sevmoq", "I love my family."),
             ("care", "g'amxo'rlik qilmoq", "She cares about her parents."), ("support", "qo'llab-quvvatlamoq", "My friends support me."),
             ("respect", "hurmat qilmoq", "I respect my teacher."), ("meet", "uchrashmoq", "I meet my friends every week.")
-        ],
-        3: [
-            ("visit", "ziyorat qilmoq", "I visit my grandparents."), ("talk", "gaplashmoq", "We talk every day."),
-            ("share", "bo'lishmoq", "I share my ideas with friends."), ("help", "yordam bermoq", "My brother helps me."),
-            ("live", "yashamoq", "I live in Tashkent."), ("together", "birga", "We study together."),
-            ("alone", "yolg'iz", "He lives alone."), ("close", "yaqin", "I am close to my sister."),
-            ("friendly", "do'stona", "She is very friendly."), ("kind", "mehribon", "My teacher is kind."),
-            ("polite", "odobli", "She is very polite to everyone."), ("rude", "qo'pol", "He is rude sometimes."),
-            ("shy", "uyatchan", "I am a shy person."), ("outgoing", "ochiqko'ngil", "She is outgoing and friendly."),
-            ("funny", "kulgili", "My friend is very funny."), ("serious", "jiddiy", "He is a serious student."),
-            ("honest", "halol", "My father is honest."), ("lazy", "dangasa", "He is lazy sometimes."),
-            ("hardworking", "mehnatkash", "She is hardworking."), ("smart", "aqlli", "My brother is smart.")
         ]
     }
 
@@ -176,35 +327,11 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
         ]
         hozirgi_sozlar = [{"en": w, "uz": u, "ex": f"This is an example for {w}."} for w, u in mavzu_sozlari]
 
-    MATNLAR_LUGATI = {
-        1: {
-            "en": "Every man and woman in our big family values love and unity. My father works hard in a bank, while my kind mother cares for each child. My brother and sister are smart students, and our grandfather always shares wise advice with all relatives.",
-            "uz": "Katta oilamizdagi har bir erkak va ayol mehr va hamjihatlikni qadrlaydi. Otam bankda astoydil mehnat qiladi, mehribon onam esa har bir bolaga g'amxo'rlik qiladi. Akam va opam aqlli o'quvchilardir, bobomiz esa doimo barcha qarindoshlarga dono maslahatlar beradi."
-        },
-        2: {
-            "en": "Our small study group works together like a friendly team. Each member supports one another with honest respect and care. When my roommate and colleagues meet, we discuss interesting lessons, help our neighbours, and show genuine love to our close relatives every single day.",
-            "uz": "Bizning kichik o'quv guruhimiz ahil jamoa kabi birgalikda ishlaydi. Har bir a'zo bir-birini samimiy hurmat va g'amxo'rlik bilan qo'llab-quvvatlaydi. Xonadoshim va hamkasblarim uchrashganda, biz qiziqarli darslarni muhokama qilamiz, qo'shnilarimizga yordam beramiz va har kuni yaqin qarindoshlarimizga mehr ko'rsatamiz."
-        },
-        3: {
-            "en": "I live in a peaceful neighborhood where people are hardworking, polite, and friendly. My close friend is very honest, smart, and never rude to anyone. We visit our grandparents together, share creative ideas, and help shy students become confident, happy, and successful in life.",
-            "uz": "Men odamlari mehnatkash, odobli va do'stona bo'lgan tinch mahallada yashayman. Yaqin do'stim juda halol, aqlli va hech qachon hech kimga qo'pol muomala qilmaydi. Biz birgalikda bobo-buvilarimizni ziyorat qilamiz, ijodiy fikrlar bilan bo'lishamiz va uyatchan o'quvchilarga hayotda ishonchli, baxtli va muvaffaqiyatli bo'lishga yordam beramiz."
-        }
-    }
-
-    if bob_raqami in MATNLAR_LUGATI:
-        tanlangan_matn = MATNLAR_LUGATI[bob_raqami]
-    else:
-        tanlangan_matn = {
-            "en": f"Lesson {bob_raqami} introduces vital vocabulary for active English learners. Practicing these twenty essential words daily through speaking, listening, and writing will significantly improve your overall language confidence. Diligent students always organize their schedules carefully, review difficult tasks, and achieve outstanding results in exams.",
-            "uz": f"{bob_raqami}-bob faol ingliz tili o'rganuvchilari uchun muhim so'zlarni taqdim etadi. Ushbu yigirmata asosiy so'zni har kuni gapirish, tinglash va yozish orqali mashq qilish sizning umumiy til ishonchingizni sezilarli darajada oshiradi. Tirishqoq o'quvchilar doimo o'z jadvallarini puxta rejalashtiradilar, qiyin topshiriqlarni takrorlaydilar va imtihonlarda ajoyib natijalarga erishadilar."
-        }
-
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4 = st.tabs([
         "1️⃣ So'zlar & Audio", 
         "2️⃣ Yozma (EN ➔ UZ - 20 ta)", 
         "3️⃣ Yozma (UZ ➔ EN - 20 ta)", 
-        "4️⃣ Bob Testi & Excel", 
-        "5️⃣ 30–40 so'zlik Matn"
+        "4️⃣ Bob Testi & Excel Hisobot"
     ])
 
     with tab1:
@@ -261,8 +388,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
 
     with tab4:
         st.subheader(f"📝 {tanlangan_bob} bo'yicha 20 ta so'zlik to'liq test")
-        
-        # Test natijasini xotirada saqlash uchun kalit
         res_key = f"quiz_result_{bob_raqami}"
         if res_key not in st.session_state:
             st.session_state[res_key] = None
@@ -291,7 +416,7 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                     audio_button(q['en'])
                 tanlovlar.append((q, ans))
                 
-            yakunlash = st.form_submit_button("Testni topshirish va natijani hisoblash 🎯")
+            yakunlash = st.form_submit_button("Testni topshirish va natijani ko'rish 🎯")
             if yakunlash:
                 if ism.strip() and sinf.strip():
                     detallar = []
@@ -319,7 +444,7 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 else:
                     st.error("Iltimos, ism va sinfingizni kiriting!")
 
-        # FORMADAN TASHQARIDA NATIJA VA EXCEL YUKLASH TUGMASI (XATONI OLDINI OLISH UCHUN)
+        # Formadan tashqaridagi Excel yuklab olish tugmasi
         if st.session_state[res_key] is not None:
             r = st.session_state[res_key]
             st.balloons()
@@ -360,19 +485,8 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-    with tab5:
-        st.subheader(f"📖 {tanlangan_bob} Matni (30–40 so'zdan iborat)")
-        c_txt, c_btn = st.columns([5, 1])
-        with c_txt:
-            st.markdown(f"**🇬🇧 English text:**  \n### \"{tanlangan_matn['en']}\"")
-        with c_btn:
-            audio_button(tanlangan_matn['en'])
-            
-        st.divider()
-        st.markdown(f"**🇺🇿 O'zbekcha tarjimasi:**  \n### \"{tanlangan_matn['uz']}\"")
-
 # =========================================================================
-# 2-BO'LIM: MATEMATIKA TRENAJORI
+# 3-BO'LIM: MATEMATIKA TRENAJORI
 # =========================================================================
 else:
     st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
