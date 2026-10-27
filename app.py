@@ -7,14 +7,19 @@ from datetime import datetime
 # Sahifa sozlamalari
 st.set_page_config(page_title="Matematika Trenajori", page_icon="🧮", layout="centered")
 
-# Orqa fonni va bloklarni toza oq rangga keltirish uchun CSS
+# Orqa fonni to'liq qora, yozuv va inputlarni mos rangga keltirish uchun CSS
 st.markdown("""
     <style>
         .stApp {
-            background-color: #FFFFFF;
-            color: #000000;
+            background-color: #0E1117;
+            color: #FFFFFF;
         }
         header {visibility: hidden;}
+        /* Matn kiritish maydonlari uchun moslash */
+        .stTextInput input, .stNumberInput input {
+            color: #FFFFFF !important;
+            background-color: #262730 !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -95,7 +100,6 @@ elif st.session_state.step == "test":
                 else:
                     st.session_state.last_result = ("error", f"Noto'g'ri! ❌ To'g'ri javob: {togri_javob} edi")
 
-                # 25 ta savol tugaganini tekshirish
                 if st.session_state.total >= 25:
                     st.session_state.step = "result"
                 else:
