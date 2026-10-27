@@ -3,6 +3,3 @@ pandas
 requests
 openpyxl
 
-streamlit
-pandas
-openpyxl
