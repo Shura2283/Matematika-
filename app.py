@@ -5,10 +5,10 @@ from io import BytesIO
 from datetime import datetime
 import streamlit.components.v1 as components
 
-# Sahifa sozlamalari
-st.set_page_config(page_title="Bilimlar Trenajori", page_icon="🎓", layout="wide")
+# Sahifa sozlamalari (initial_sidebar_state="expanded" orqali menyuni ochiq holda boshlash)
+st.set_page_config(page_title="Bilimlar Trenajori", page_icon="🎓", layout="wide", initial_sidebar_state="expanded")
 
-# Ko'k, yashil, sariq, qizil gradient fon va chiroyli jadvallar
+# Ko'k, yashil, sariq, qizil gradient fon va menyuni boshqarish tugmasi dizayni
 st.markdown("""
     <style>
         .stApp {
@@ -16,7 +16,16 @@ st.markdown("""
             background-attachment: fixed;
             color: #FFFFFF;
         }
-        header {visibility: hidden;}
+        
+        /* Menyu tugmasi doim aniq ko'rinishi uchun sozlama */
+        button[data-testid="stSidebarCollapseButton"], button[data-testid="stSidebarExpandButton"] {
+            background-color: rgba(37, 99, 235, 0.9) !important;
+            color: #FFFFFF !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            padding: 4px 8px !important;
+        }
+        
         div[data-testid="stForm"], div[data-testid="stMetric"], .custom-card {
             background-color: rgba(15, 23, 42, 0.85) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -49,8 +58,41 @@ st.markdown("""
             border: 1px solid rgba(255, 255, 255, 0.25);
             margin-bottom: 15px;
         }
+        .toggle-btn {
+            background: rgba(37, 99, 235, 0.85);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
     </style>
 """, unsafe_allow_html=True)
+
+# Ekranning o'zida yon menyuni yashirish / ko'rsatish uchun JavaScript tugma
+components.html("""
+    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+        <button class="toggle-btn" onclick="toggleSidebar()" style="background:#2563EB;color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:bold;font-size:13px;">
+            ☰ Menyuni ochish / yopish
+        </button>
+    </div>
+    <script>
+    function toggleSidebar() {
+        const doc = window.parent.document;
+        const collapseBtn = doc.querySelector('button[data-testid="stSidebarCollapseButton"]');
+        const expandBtn = doc.querySelector('button[data-testid="stSidebarExpandButton"]');
+        if (collapseBtn) {
+            collapseBtn.click();
+        } else if (expandBtn) {
+            expandBtn.click();
+        }
+    }
+    </script>
+""", height=50)
 
 # Yon menyu (Sidebar) sozlamalari
 st.sidebar.title("⚙️ Sozlamalar & Bo'limlar")
@@ -96,7 +138,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
     tanlangan_bob = st.sidebar.selectbox("O'rganish uchun Bobni tanlang:", bob_nomlari)
     bob_raqami = int(tanlangan_bob.split("-")[0])
 
-    # Kitobdagi so'zlar bazasi (mavzulashtirilgan)
     KITOB_SOZLARI = {
         1: [
             ("man", "erkak", "He is a tall man."), ("woman", "ayol", "She is a kind woman."),
@@ -148,7 +189,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
         ]
         hozirgi_sozlar = [{"en": w, "uz": u, "ex": f"This is an example for {w}."} for w, u in mavzu_sozlari]
 
-    # HAR BIR BOB UCHUN 30-40 SO'ZDAN IBORAT MAXSUS MATNLAR BAZASI
     MATNLAR_LUGATI = {
         1: {
             "en": "Every man and woman in our big family values love and unity. My father works hard in a bank, while my kind mother cares for each child. My brother and sister are smart students, and our grandfather always shares wise advice with all relatives.",
@@ -161,18 +201,9 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
         3: {
             "en": "I live in a peaceful neighborhood where people are hardworking, polite, and friendly. My close friend is very honest, smart, and never rude to anyone. We visit our grandparents together, share creative ideas, and help shy students become confident, happy, and successful in life.",
             "uz": "Men odamlari mehnatkash, odobli va do'stona bo'lgan tinch mahallada yashayman. Yaqin do'stim juda halol, aqlli va hech qachon hech kimga qo'pol muomala qilmaydi. Biz birgalikda bobo-buvilarimizni ziyorat qilamiz, ijodiy fikrlar bilan bo'lishamiz va uyatchan o'quvchilarga hayotda ishonchli, baxtli va muvaffaqiyatli bo'lishga yordam beramiz."
-        },
-        4: {
-            "en": "A hardworking person always remains calm, patient, and polite even during very difficult moments. My brother is clever and serious about his duties, while my sister is outgoing and funny. They both avoid lazy habits and stay emotionally strong and proud of their daily progress.",
-            "uz": "Mehnatkash inson hatto eng qiyin damlarda ham doimo xotirjam, sabrli va odobli bo'lib qoladi. Akam o'z vazifalariga jiddiy va ziyrak qaraydi, singlim esa ochiqko'ngil va quvnoq. Ularning ikkalasi ham dangasalik odatlaridan qochishadi va o'zlarining kundalik yutuqlaridan faxrlanib, ruhiy jihatdan kuchli bo'lib qolishadi."
-        },
-        5: {
-            "en": "In our modern society, every educated citizen respects cultural traditions and cares for older generations. Many young teenagers and adults live together peacefully in beautiful towns. They help poor families, build strong communities, and create great opportunities for every hardworking person to succeed.",
-            "uz": "Zamonaviy jamiyatimizda har bir ma'lumotli fuqaro madaniy an'analarni hurmat qiladi va katta avlodga g'amxo'rlik qiladi. Ko'plab yosh o'smirlar va kattalar go'zal shaharchalarda tinch-totuv birga yashaydilar. Ular muhtoj oilalarga yordam berishadi, kuchli jamoalar qurishadi va har bir mehnatkash insonning muvaffaqiyat qozonishi uchun katta imkoniyatlar yaratishadi."
         }
     }
 
-    # 6-bobdan 50-bobgacha har xil, 30-40 so'zdan iborat matn chiqarish
     if bob_raqami in MATNLAR_LUGATI:
         tanlangan_matn = MATNLAR_LUGATI[bob_raqami]
     else:
@@ -186,15 +217,11 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
         "2️⃣ Yozma (EN ➔ UZ - 20 ta)", 
         "3️⃣ Yozma (UZ ➔ EN - 20 ta)", 
         "4️⃣ Bob Testi & Excel", 
-        "5️⃣ 30–40 so'zlik Matn (Reading)"
+        "5️⃣ 30–40 so'zlik Matn"
     ])
 
-    # 1-TAB: So'zlar va Ovoz
     with tab1:
         st.subheader(f"📖 {tanlangan_bob} — 20 ta asosiy so'z")
-        if not audio_enabled:
-            st.warning("⚠️ Ovoz hozirda o'chirilgan (Sidebar orqali yoqishingiz mumkin).")
-        
         for idx, item in enumerate(hozirgi_sozlar):
             c1, c2 = st.columns([5, 1])
             with c1:
@@ -203,7 +230,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 audio_button(item['en'])
             st.divider()
 
-    # 2-TAB: 20 ta so'z EN ➔ UZ yozish
     with tab2:
         st.subheader("✍️ 20 ta so'zning o'zbekcha tarjimasini yozing:")
         with st.form(f"form_en_uz_{bob_raqami}"):
@@ -217,7 +243,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 foydalanuvchi_javoblari_1.append((item, ans))
                 
             tekshir_1 = st.form_submit_button("20 ta javobni tekshirish")
-            
             if tekshir_1:
                 togri_1 = 0
                 for item, ans in foydalanuvchi_javoblari_1:
@@ -228,7 +253,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                         st.error(f"❌ Xato: **{item['en']}** ➔ To'g'ri javob: {item['uz']} (Kiritildi: '{ans}')")
                 st.info(f"📊 Natija: 20 tadan {togri_1} ta to'g'ri!")
 
-    # 3-TAB: 20 ta so'z UZ ➔ EN yozish
     with tab3:
         st.subheader("✍️ 20 ta so'zning inglizcha tarjimasini yozing:")
         with st.form(f"form_uz_en_{bob_raqami}"):
@@ -238,7 +262,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 foydalanuvchi_javoblari_2.append((item, ans))
                 
             tekshir_2 = st.form_submit_button("20 ta inglizcha so'zni tekshirish")
-            
             if tekshir_2:
                 togri_2 = 0
                 for item, ans in foydalanuvchi_javoblari_2:
@@ -249,7 +272,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                         st.error(f"❌ Xato: **{item['uz']}** ➔ To'g'risi: '{item['en']}' (Kiritildi: '{ans}')")
                 st.info(f"📊 Natija: 20 tadan {togri_2} ta to'g'ri!")
 
-    # 4-TAB: Bob Testi & Excel Kompilyatsiyasi
     with tab4:
         st.subheader(f"📝 {tanlangan_bob} bo'yicha 20 ta so'zlik to'liq test")
         with st.form(f"test_form_all_{bob_raqami}"):
@@ -277,7 +299,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 tanlovlar.append((q, ans))
                 
             yakunlash = st.form_submit_button("Testni topshirish va Excel olish 🎯")
-            
             if yakunlash:
                 if ism.strip() and sinf.strip():
                     detallar = []
@@ -338,11 +359,8 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 else:
                     st.error("Iltimos, ism va sinfingizni kiriting!")
 
-    # 5-TAB: 30-40 so'zdan iborat matn va Audio
     with tab5:
         st.subheader(f"📖 {tanlangan_bob} Matni (30–40 so'zdan iborat)")
-        st.caption("Ushbu matn aynan shu bobdagi yangi so'zlardan tuzilgan bo'lib, talaffuzni eshitish tugmasiga ega.")
-        
         c_txt, c_btn = st.columns([5, 1])
         with c_txt:
             st.markdown(f"**🇬🇧 English text:**  \n### \"{tanlangan_matn['en']}\"")
