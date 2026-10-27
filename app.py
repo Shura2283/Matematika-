@@ -7,24 +7,61 @@ from datetime import datetime
 # Sahifa sozlamalari
 st.set_page_config(page_title="Matematika Trenajori", page_icon="🧮", layout="centered")
 
-# Qora fon va mos dizayn uchun CSS
+# Ko'k, yashil, sariq va qizil ranglar aralashmasi (gradient fon) va aniq jadvallar dizayni
 st.markdown("""
     <style>
         .stApp {
-            background-color: #0E1117;
+            background: linear-gradient(135deg, #0d324d 0%, #1e5239 30%, #7d6b14 70%, #5e1914 100%);
+            background-attachment: fixed;
             color: #FFFFFF;
         }
         header {visibility: hidden;}
-        .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+        
+        /* Matnlar va jadvallar aniq ko'rinishi uchun shaffof bloklar */
+        div[data-testid="stForm"], div[data-testid="stMetric"], .author-card, .result-card {
+            background-color: rgba(15, 23, 42, 0.78) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 14px !important;
+            padding: 16px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+        }
+        
+        /* Metric bloklar ichidagi yozuvlar */
+        div[data-testid="stMetricValue"] {
+            color: #F8FAFC !important;
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
+        }
+        div[data-testid="stMetricLabel"] {
+            color: #CBD5E1 !important;
+            font-size: 1rem !important;
+        }
+        
+        /* Inputlar (kiritish maydonlari) */
+        .stTextInput input, .stNumberInput input {
             color: #FFFFFF !important;
-            background-color: #262730 !important;
+            background-color: rgba(30, 41, 59, 0.9) !important;
+            border: 1px solid #64748B !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Muallif yozuvi uslubi */
+        .author-badge {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            color: #F1F5F9;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            margin-bottom: 15px;
         }
     </style>
 """, unsafe_allow_html=True)
 
 # Holatlarni (session_state) boshlang'ich sozlash
 if "step" not in st.session_state:
-    st.session_state.step = "login"  # "login" -> "test" -> "result"
+    st.session_state.step = "login"
     st.session_state.student_name = ""
     st.session_state.student_class = ""
     st.session_state.chosen_op = "Aralash (+, -, *, /)"
@@ -32,7 +69,7 @@ if "step" not in st.session_state:
     st.session_state.total = 0
     st.session_state.last_result = None
 
-# Savol tuzish funksiyasi
+# Savol generatsiya qilish
 def yangi_savol():
     tanlov = st.session_state.chosen_op
     
@@ -47,12 +84,10 @@ def yangi_savol():
     else:
         op = random.choice(["+", "-", "*", "/"])
         
-    # Bo'lish amali butun son chiqishi uchun maxsus mantiq
     if op == "/":
         boluvchi = random.randint(2, 10)
         bolinma = random.randint(1, 12)
-        bolinuvchi = boluvchi * bolinma
-        st.session_state.num1 = bolinuvchi
+        st.session_state.num1 = boluvchi * bolinma
         st.session_state.num2 = boluvchi
     elif op == "*":
         st.session_state.num1 = random.randint(2, 10)
@@ -68,10 +103,11 @@ def yangi_savol():
         
     st.session_state.operation = op
 
-# ================= 1-BOSQICH: MA'LUMOT VA AMALNI TANLASH =================
+# ================= 1-BOSQICH: MA'LUMOT VA AMAL TANLASH =================
 if st.session_state.step == "login":
+    st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
     st.title("🧮 Matematika Trenajori")
-    st.subheader("Testni boshlashdan oldin ma'lumotlarni kiriting:")
+    st.write("Testni boshlashdan oldin ma'lumotlaringizni to'ldiring:")
 
     with st.form("login_form"):
         ism_familiya = st.text_input("Familiya va Ismingiz:", placeholder="Masalan: Karimov Ali")
@@ -101,10 +137,11 @@ if st.session_state.step == "login":
             else:
                 st.error("Iltimos, ism-familiyangiz va sinfingizni to'liq kiriting!")
 
-# ================= 2-BOSQICH: 25 TA MISOL TESTI =================
+# ================= 2-BOSQICH: TEST JARAYONI =================
 elif st.session_state.step == "test":
-    st.subheader(f"O'quvchi: {st.session_state.student_name} | Sinf: {st.session_state.student_class}")
-    st.caption(f"Tanlangan bo'lim: **{st.session_state.chosen_op}**")
+    st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
+    st.subheader(f"👤 O'quvchi: {st.session_state.student_name} | Sinf: {st.session_state.student_class}")
+    st.caption(f"Amal turi: **{st.session_state.chosen_op}**")
     
     n1 = st.session_state.num1
     n2 = st.session_state.num2
@@ -119,11 +156,12 @@ elif st.session_state.step == "test":
     else:
         togri_javob = n1 // n2
 
+    # Aniq jadval ko'rinishidagi statistika
     col1, col2 = st.columns(2)
-    col1.metric("Misol raqami", f"{st.session_state.total + 1} / 25")
-    col2.metric("Joriy to'g'ri javoblar", f"{st.session_state.score}")
+    col1.metric("Misol tartibi", f"{st.session_state.total + 1} / 25")
+    col2.metric("To'g'ri javoblar", f"{st.session_state.score} ta")
 
-    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     if st.session_state.last_result:
         status, msg = st.session_state.last_result
@@ -132,7 +170,6 @@ elif st.session_state.step == "test":
         else:
             st.error(msg)
 
-    # Belgini chiroyli ko'rsatish
     display_op = "÷" if op == "/" else ("×" if op == "*" else op)
     st.subheader(f"Misolni yeching: **{n1} {display_op} {n2} = ?**")
 
@@ -157,7 +194,7 @@ elif st.session_state.step == "test":
             else:
                 st.warning("Iltimos, avval javobni yozing!")
 
-# ================= 3-BOSQICH: NATIJA VA EXCEL YUKLASH =================
+# ================= 3-BOSQICH: NATIJA VA EXCEL JADVALI =================
 elif st.session_state.step == "result":
     togri = st.session_state.score
     xato = 25 - togri
@@ -166,14 +203,22 @@ elif st.session_state.step == "result":
     st.balloons()
     st.success("🎉 **Test muvaffaqiyatli yakunlandi!**")
     
-    st.write(f"**O'quvchi:** {st.session_state.student_name}")
-    st.write(f"**Sinf:** {st.session_state.student_class}")
-    st.write(f"**Yo'nalish:** {st.session_state.chosen_op}")
+    st.markdown(f"""
+        <div class="author-card" style="margin-bottom: 20px;">
+            <h3>📊 Natijalar xulosasi</h3>
+            <p><b>O'quvchi:</b> {st.session_state.student_name}</p>
+            <p><b>Sinf:</b> {st.session_state.student_class}</p>
+            <p><b>Yo'nalish:</b> {st.session_state.chosen_op}</p>
+            <p><b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</p>
+        </div>
+    """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
     col1.metric("To'g'ri", f"{togri} ta")
     col2.metric("Xato", f"{xato} ta")
     col3.metric("To'plangan ball", f"{ball} / 100")
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     hozirgi_vaqt = datetime.now().strftime("%Y-%m-%d %H:%M")
     natija_data = {
@@ -184,9 +229,13 @@ elif st.session_state.step == "result":
         "Xato javoblar": [xato],
         "To'plangan ball": [ball],
         "Maksimal ball": [100],
-        "Sana va vaqt": [hozirgi_vaqt]
+        "Sana va vaqt": [hozirgi_vaqt],
+        "Tuzuvchi": ["Quljanova Shukurjon Zaribovna"]
     }
     df = pd.DataFrame(natija_data)
+
+    st.subheader("📋 Natija jadvali:")
+    st.dataframe(df, use_container_width=True)
 
     excel_buffer = BytesIO()
     with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
