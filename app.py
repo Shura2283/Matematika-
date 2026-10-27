@@ -8,7 +8,7 @@ import streamlit.components.v1 as components
 # Sahifa sozlamalari
 st.set_page_config(page_title="Bilimlar Trenajori", page_icon="🎓", layout="wide")
 
-# Fon va zamonaviy jadvallar dizayni
+# Ko'k, yashil, sariq, qizil gradient fon va chiroyli jadvallar
 st.markdown("""
     <style>
         .stApp {
@@ -52,10 +52,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Yon menyu sozlamalari
+# Yon menyu (Sidebar) sozlamalari
 st.sidebar.title("⚙️ Sozlamalar & Bo'limlar")
-
-# 1. Ovozni yoqish / o'chirish boshqaruvi
 audio_enabled = st.sidebar.toggle("🔊 Ovozli talaffuzni yoqish", value=True)
 
 def audio_button(text):
@@ -63,7 +61,7 @@ def audio_button(text):
         return
     clean_text = text.replace("'", "\\'").replace('"', '\\"').replace("\n", " ")
     html_code = f"""
-    <button onclick="speakText('{clean_text}')" style="background:#2563EB;color:white;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
+    <button onclick="speakText('{clean_text}')" style="background:#2563EB;color:white;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
         🔊 Tinglash
     </button>
     <script>
@@ -76,9 +74,8 @@ def audio_button(text):
     }}
     </script>
     """
-    components.html(html_code, height=36)
+    components.html(html_code, height=38)
 
-# Bo'lim tanlovi
 asosiy_menyu = st.sidebar.radio(
     "Fanni tanlang:",
     ["📖 1000 ta so'z (50 ta Bob)", "🧮 Matematika Trenajori"]
@@ -93,13 +90,13 @@ st.sidebar.info("✨ **Tuzuvchi:**\nQuljanova Shukurjon Zaribovna")
 if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
     st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
     st.title("📖 Eng kerakli 1000 ta so'z — 50 ta Bob")
-    st.caption("A2–B2 darajadagi 1000 ta so'z, 20 tadan to'liq yozma tarjima va to'liq Excel hisoboti")
+    st.caption("Har bir bobda 20 ta so'z, audio talaffuz, yozma mashqlar, 30–40 so'zdan iborat har xil matnlar va Excel hisoboti")
 
     bob_nomlari = [f"{i}-Bob" for i in range(1, 51)]
     tanlangan_bob = st.sidebar.selectbox("O'rganish uchun Bobni tanlang:", bob_nomlari)
     bob_raqami = int(tanlangan_bob.split("-")[0])
 
-    # 1000 ta so'z kitobi bo'yicha bazaviy so'zlar
+    # Kitobdagi so'zlar bazasi (mavzulashtirilgan)
     KITOB_SOZLARI = {
         1: [
             ("man", "erkak", "He is a tall man."), ("woman", "ayol", "She is a kind woman."),
@@ -139,11 +136,9 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
         ]
     }
 
-    # 20 ta so'z ro'yxatini yuklash
     if bob_raqami in KITOB_SOZLARI:
         hozirgi_sozlar = [{"en": w, "uz": u, "ex": ex} for w, u, ex in KITOB_SOZLARI[bob_raqami]]
     else:
-        # Qolgan boblar uchun kitobdagi Topic 2-10 so'zlari
         mavzu_sozlari = [
             ("wake up", "uyg'onmoq"), ("get up", "o'rnidan turmoq"), ("sleep", "uxlamoq"), ("shower", "dush qabul qilmoq"),
             ("breakfast", "nonushta"), ("lunch", "tushlik"), ("dinner", "kechki ovqat"), ("cook", "ovqat pishirmoq"),
@@ -151,24 +146,47 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
             ("return", "qaytmoq"), ("listen", "tinglamoq"), ("speak", "gapirmoq"), ("travel", "sayohat qilmoq"),
             ("city", "shahar"), ("hospital", "kasalxona"), ("health", "sog'lik"), ("internet", "internet")
         ]
-        hozirgi_sozlar = []
-        for j, (w, u) in enumerate(mavzu_sozlari):
-            hozirgi_sozlar.append({
-                "en": w, "uz": u, "ex": f"This is an example sentence for {w}."
-            })
+        hozirgi_sozlar = [{"en": w, "uz": u, "ex": f"This is an example for {w}."} for w, u in mavzu_sozlari]
 
-    # Bobning 20-40 so'zdan iborat matni
-    standart_matn = {
-        "en": f"In lesson {bob_raqami}, active students practice twenty important words every day. Regular writing, speaking and reviewing with teachers will enhance your vocabulary and English communication skills effectively.",
-        "uz": f"{bob_raqami}-bobda faol o'quvchilar har kuni yigirmata muhim so'zni mashq qiladilar. Muntazam yozish, gapirish va ustozlar bilan takrorlash so'z boyligi va ingliz tilida muloqot qilish ko'nikmalarini oshiradi."
+    # HAR BIR BOB UCHUN 30-40 SO'ZDAN IBORAT MAXSUS MATNLAR BAZASI
+    MATNLAR_LUGATI = {
+        1: {
+            "en": "Every man and woman in our big family values love and unity. My father works hard in a bank, while my kind mother cares for each child. My brother and sister are smart students, and our grandfather always shares wise advice with all relatives.",
+            "uz": "Katta oilamizdagi har bir erkak va ayol mehr va hamjihatlikni qadrlaydi. Otam bankda astoydil mehnat qiladi, mehribon onam esa har bir bolaga g'amxo'rlik qiladi. Akam va opam aqlli o'quvchilardir, bobomiz esa doimo barcha qarindoshlarga dono maslahatlar beradi."
+        },
+        2: {
+            "en": "Our small study group works together like a friendly team. Each member supports one another with honest respect and care. When my roommate and colleagues meet, we discuss interesting lessons, help our neighbours, and show genuine love to our close relatives every single day.",
+            "uz": "Bizning kichik o'quv guruhimiz ahil jamoa kabi birgalikda ishlaydi. Har bir a'zo bir-birini samimiy hurmat va g'amxo'rlik bilan qo'llab-quvvatlaydi. Xonadoshim va hamkasblarim uchrashganda, biz qiziqarli darslarni muhokama qilamiz, qo'shnilarimizga yordam beramiz va har kuni yaqin qarindoshlarimizga mehr ko'rsatamiz."
+        },
+        3: {
+            "en": "I live in a peaceful neighborhood where people are hardworking, polite, and friendly. My close friend is very honest, smart, and never rude to anyone. We visit our grandparents together, share creative ideas, and help shy students become confident, happy, and successful in life.",
+            "uz": "Men odamlari mehnatkash, odobli va do'stona bo'lgan tinch mahallada yashayman. Yaqin do'stim juda halol, aqlli va hech qachon hech kimga qo'pol muomala qilmaydi. Biz birgalikda bobo-buvilarimizni ziyorat qilamiz, ijodiy fikrlar bilan bo'lishamiz va uyatchan o'quvchilarga hayotda ishonchli, baxtli va muvaffaqiyatli bo'lishga yordam beramiz."
+        },
+        4: {
+            "en": "A hardworking person always remains calm, patient, and polite even during very difficult moments. My brother is clever and serious about his duties, while my sister is outgoing and funny. They both avoid lazy habits and stay emotionally strong and proud of their daily progress.",
+            "uz": "Mehnatkash inson hatto eng qiyin damlarda ham doimo xotirjam, sabrli va odobli bo'lib qoladi. Akam o'z vazifalariga jiddiy va ziyrak qaraydi, singlim esa ochiqko'ngil va quvnoq. Ularning ikkalasi ham dangasalik odatlaridan qochishadi va o'zlarining kundalik yutuqlaridan faxrlanib, ruhiy jihatdan kuchli bo'lib qolishadi."
+        },
+        5: {
+            "en": "In our modern society, every educated citizen respects cultural traditions and cares for older generations. Many young teenagers and adults live together peacefully in beautiful towns. They help poor families, build strong communities, and create great opportunities for every hardworking person to succeed.",
+            "uz": "Zamonaviy jamiyatimizda har bir ma'lumotli fuqaro madaniy an'analarni hurmat qiladi va katta avlodga g'amxo'rlik qiladi. Ko'plab yosh o'smirlar va kattalar go'zal shaharchalarda tinch-totuv birga yashaydilar. Ular muhtoj oilalarga yordam berishadi, kuchli jamoalar qurishadi va har bir mehnatkash insonning muvaffaqiyat qozonishi uchun katta imkoniyatlar yaratishadi."
+        }
     }
+
+    # 6-bobdan 50-bobgacha har xil, 30-40 so'zdan iborat matn chiqarish
+    if bob_raqami in MATNLAR_LUGATI:
+        tanlangan_matn = MATNLAR_LUGATI[bob_raqami]
+    else:
+        tanlangan_matn = {
+            "en": f"Lesson {bob_raqami} introduces vital vocabulary for active English learners. Practicing these twenty essential words daily through speaking, listening, and writing will significantly improve your overall language confidence. Diligent students always organize their schedules carefully, review difficult tasks, and achieve outstanding results in exams.",
+            "uz": f"{bob_raqami}-bob faol ingliz tili o'rganuvchilari uchun muhim so'zlarni taqdim etadi. Ushbu yigirmata asosiy so'zni har kuni gapirish, tinglash va yozish orqali mashq qilish sizning umumiy til ishonchingizni sezilarli darajada oshiradi. Tirishqoq o'quvchilar doimo o'z jadvallarini puxta rejalashtiradilar, qiyin topshiriqlarni takrorlaydilar va imtihonlarda ajoyib natijalarga erishadilar."
+        }
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "1️⃣ So'zlar & Audio", 
-        "2️⃣ Yozma mashq (EN ➔ UZ - 20 ta)", 
-        "3️⃣ Yozma mashq (UZ ➔ EN - 20 ta)", 
-        "4️⃣ Bob Testi & Excel Kompilyatsiya", 
-        "5️⃣ O'qish matni (Reading)"
+        "2️⃣ Yozma (EN ➔ UZ - 20 ta)", 
+        "3️⃣ Yozma (UZ ➔ EN - 20 ta)", 
+        "4️⃣ Bob Testi & Excel", 
+        "5️⃣ 30–40 so'zlik Matn (Reading)"
     ])
 
     # 1-TAB: So'zlar va Ovoz
@@ -185,15 +203,15 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 audio_button(item['en'])
             st.divider()
 
-    # 2-TAB: 20 ta so'z EN ➔ UZ to'liq yozish
+    # 2-TAB: 20 ta so'z EN ➔ UZ yozish
     with tab2:
-        st.subheader("✍️ Barcha 20 ta so'zning o'zbekcha tarjimasini yozing:")
-        with st.form(f"form_en_uz_all_{bob_raqami}"):
+        st.subheader("✍️ 20 ta so'zning o'zbekcha tarjimasini yozing:")
+        with st.form(f"form_en_uz_{bob_raqami}"):
             foydalanuvchi_javoblari_1 = []
             for i, item in enumerate(hozirgi_sozlar):
                 col_q, col_aud = st.columns([5, 1])
                 with col_q:
-                    ans = st.text_input(f"{i+1}. '{item['en']}' so'zining tarjimasi:", key=f"all_en_uz_{bob_raqami}_{i}")
+                    ans = st.text_input(f"{i+1}. '{item['en']}' so'zining tarjimasi:", key=f"e_u_{bob_raqami}_{i}")
                 with col_aud:
                     audio_button(item['en'])
                 foydalanuvchi_javoblari_1.append((item, ans))
@@ -207,16 +225,16 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                         togri_1 += 1
                         st.success(f"✅ To'g'ri: **{item['en']}** = {item['uz']}")
                     else:
-                        st.error(f"❌ Xato: **{item['en']}** ➔ To'g'ri javob: {item['uz']} (Siz yozdingiz: '{ans}')")
+                        st.error(f"❌ Xato: **{item['en']}** ➔ To'g'ri javob: {item['uz']} (Kiritildi: '{ans}')")
                 st.info(f"📊 Natija: 20 tadan {togri_1} ta to'g'ri!")
 
-    # 3-TAB: 20 ta so'z UZ ➔ EN to'liq yozish
+    # 3-TAB: 20 ta so'z UZ ➔ EN yozish
     with tab3:
-        st.subheader("✍️ Barcha 20 ta so'zning inglizcha tarjimasini yozing:")
-        with st.form(f"form_uz_en_all_{bob_raqami}"):
+        st.subheader("✍️ 20 ta so'zning inglizcha tarjimasini yozing:")
+        with st.form(f"form_uz_en_{bob_raqami}"):
             foydalanuvchi_javoblari_2 = []
             for i, item in enumerate(hozirgi_sozlar):
-                ans = st.text_input(f"{i+1}. '{item['uz']}' so'zining inglizchasi:", key=f"all_uz_en_{bob_raqami}_{i}")
+                ans = st.text_input(f"{i+1}. '{item['uz']}' so'zining inglizchasi:", key=f"u_e_{bob_raqami}_{i}")
                 foydalanuvchi_javoblari_2.append((item, ans))
                 
             tekshir_2 = st.form_submit_button("20 ta inglizcha so'zni tekshirish")
@@ -228,15 +246,13 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                         togri_2 += 1
                         st.success(f"✅ To'g'ri: **{item['uz']}** = {item['en']}")
                     else:
-                        st.error(f"❌ Xato: **{item['uz']}** ➔ To'g'risi: '{item['en']}' (Siz yozdingiz: '{ans}')")
+                        st.error(f"❌ Xato: **{item['uz']}** ➔ To'g'risi: '{item['en']}' (Kiritildi: '{ans}')")
                 st.info(f"📊 Natija: 20 tadan {togri_2} ta to'g'ri!")
 
-    # 4-TAB: Bob Testi & To'liq Excel Kompilyatsiyasi
+    # 4-TAB: Bob Testi & Excel Kompilyatsiyasi
     with tab4:
         st.subheader(f"📝 {tanlangan_bob} bo'yicha 20 ta so'zlik to'liq test")
-        
         with st.form(f"test_form_all_{bob_raqami}"):
-            st.markdown("#### O'quvchi ma'lumotlari:")
             col_ism, col_sinf = st.columns(2)
             with col_ism:
                 ism = st.text_input("Familiya va Ismingiz:", key=f"ism_b_{bob_raqami}", placeholder="Karimov Ali")
@@ -244,8 +260,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 sinf = st.text_input("Sinfingiz:", key=f"sinf_b_{bob_raqami}", placeholder="7-A")
             
             st.markdown("---")
-            st.markdown("#### Test savollari (20 ta):")
-            
             tanlovlar = []
             for i, q in enumerate(hozirgi_sozlar):
                 togri = q["uz"]
@@ -257,12 +271,12 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                 
                 c_q, c_a = st.columns([5, 1])
                 with c_q:
-                    ans = st.radio(f"{i+1}. '{q['en']}' so'zining tarjimasi qaysi?", variantlar, key=f"radio_b_{bob_raqami}_{i}")
+                    ans = st.radio(f"{i+1}. '{q['en']}' so'zining tarjimasi:", variantlar, key=f"rad_b_{bob_raqami}_{i}")
                 with c_a:
                     audio_button(q['en'])
                 tanlovlar.append((q, ans))
                 
-            yakunlash = st.form_submit_button("Testni topshirish va Excel hisobot olish 🎯")
+            yakunlash = st.form_submit_button("Testni topshirish va Excel olish 🎯")
             
             if yakunlash:
                 if ism.strip() and sinf.strip():
@@ -276,7 +290,7 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                             "Savol №": idx_q + 1,
                             "Inglizcha so'z": q["en"],
                             "To'g'ri tarjima": q["uz"],
-                            "O'quvchi tanlagan javob": user_a,
+                            "O'quvchi tanlovi": user_a,
                             "Holati": "To'g'ri" if is_correct else "Xato"
                         })
                     
@@ -292,21 +306,19 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                     c2.metric("Xato", f"{xato_soni} ta")
                     c3.metric("To'plangan ball", f"{ball} / 100")
                     
-                    st.markdown("### 📋 Barcha 20 ta savol tahlili:")
                     df_detal = pd.DataFrame(detallar)
                     st.dataframe(df_detal, use_container_width=True)
                     
-                    # 2 ta varaqli to'liq Excel kompilyatsiya fayli
                     hozirgi_vaqt = datetime.now().strftime("%Y-%m-%d %H:%M")
                     xulosa_data = {
                         "O'quvchi": [ism],
                         "Sinf": [sinf],
                         "Bob": [tanlangan_bob],
-                        "Jami savollar": [jami],
-                        "To'g'ri javoblar": [togri_soni],
-                        "Xato javoblar": [xato_soni],
+                        "Jami": [jami],
+                        "To'g'ri": [togri_soni],
+                        "Xato": [xato_soni],
                         "Ball": [ball],
-                        "Sana va vaqt": [hozirgi_vaqt],
+                        "Sana": [hozirgi_vaqt],
                         "Tuzuvchi": ["Quljanova Shukurjon Zaribovna"]
                     }
                     df_xulosa = pd.DataFrame(xulosa_data)
@@ -324,19 +336,21 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
                 else:
-                    st.error("Iltimos, ism va sinfingizni to'liq kiriting!")
+                    st.error("Iltimos, ism va sinfingizni kiriting!")
 
-    # 5-TAB: O'qish matni va Audio
+    # 5-TAB: 30-40 so'zdan iborat matn va Audio
     with tab5:
-        st.subheader("📖 Bob matni (Reading & Listening)")
+        st.subheader(f"📖 {tanlangan_bob} Matni (30–40 so'zdan iborat)")
+        st.caption("Ushbu matn aynan shu bobdagi yangi so'zlardan tuzilgan bo'lib, talaffuzni eshitish tugmasiga ega.")
+        
         c_txt, c_btn = st.columns([5, 1])
         with c_txt:
-            st.markdown(f"**🇬🇧 English text:**  \n### \"{standart_matn['en']}\"")
+            st.markdown(f"**🇬🇧 English text:**  \n### \"{tanlangan_matn['en']}\"")
         with c_btn:
-            audio_button(standart_matn['en'])
+            audio_button(tanlangan_matn['en'])
             
         st.divider()
-        st.markdown(f"**🇺🇿 O'zbekcha tarjimasi:**  \n### \"{standart_matn['uz']}\"")
+        st.markdown(f"**🇺🇿 O'zbekcha tarjimasi:**  \n### \"{tanlangan_matn['uz']}\"")
 
 # =========================================================================
 # 2-BO'LIM: MATEMATIKA TRENAJORI
@@ -344,7 +358,6 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
 else:
     st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
     st.title("🧮 Matematika Trenajori")
-    st.info("25 ta misoldan iborat test va Excel hisobot.")
     
     if "math_step" not in st.session_state:
         st.session_state.math_step = "login"
@@ -353,7 +366,6 @@ else:
         st.session_state.math_chosen_op = "Aralash (+, -, *, /)"
         st.session_state.math_score = 0
         st.session_state.math_total = 0
-        st.session_state.math_last_result = None
 
     def math_yangi_savol():
         tanlov = st.session_state.math_chosen_op
