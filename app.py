@@ -5,7 +5,7 @@ from io import BytesIO
 from datetime import datetime
 import streamlit.components.v1 as components
 
-# Sahifa sozlamalari (initial_sidebar_state="expanded" orqali menyuni ochiq holda boshlash)
+# Sahifa sozlamalari
 st.set_page_config(page_title="Bilimlar Trenajori", page_icon="🎓", layout="wide", initial_sidebar_state="expanded")
 
 # Ko'k, yashil, sariq, qizil gradient fon va menyuni boshqarish tugmasi dizayni
@@ -17,7 +17,6 @@ st.markdown("""
             color: #FFFFFF;
         }
         
-        /* Menyu tugmasi doim aniq ko'rinishi uchun sozlama */
         button[data-testid="stSidebarCollapseButton"], button[data-testid="stSidebarExpandButton"] {
             background-color: rgba(37, 99, 235, 0.9) !important;
             color: #FFFFFF !important;
@@ -58,25 +57,13 @@ st.markdown("""
             border: 1px solid rgba(255, 255, 255, 0.25);
             margin-bottom: 15px;
         }
-        .toggle-btn {
-            background: rgba(37, 99, 235, 0.85);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 15px;
-            display: inline-block;
-        }
     </style>
 """, unsafe_allow_html=True)
 
-# Ekranning o'zida yon menyuni yashirish / ko'rsatish uchun JavaScript tugma
+# Yon menyuni ochish/yopish tugmasi
 components.html("""
     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-        <button class="toggle-btn" onclick="toggleSidebar()" style="background:#2563EB;color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:bold;font-size:13px;">
+        <button onclick="toggleSidebar()" style="background:#2563EB;color:white;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:bold;font-size:13px;">
             ☰ Menyuni ochish / yopish
         </button>
     </div>
@@ -94,7 +81,7 @@ components.html("""
     </script>
 """, height=50)
 
-# Yon menyu (Sidebar) sozlamalari
+# Yon menyu sozlamalari
 st.sidebar.title("⚙️ Sozlamalar & Bo'limlar")
 audio_enabled = st.sidebar.toggle("🔊 Ovozli talaffuzni yoqish", value=True)
 
@@ -132,7 +119,7 @@ st.sidebar.info("✨ **Tuzuvchi:**\nQuljanova Shukurjon Zaribovna")
 if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
     st.markdown('<div class="author-badge">✨ <b>Tuzuvchi:</b> Quljanova Shukurjon Zaribovna</div>', unsafe_allow_html=True)
     st.title("📖 Eng kerakli 1000 ta so'z — 50 ta Bob")
-    st.caption("Har bir bobda 20 ta so'z, audio talaffuz, yozma mashqlar, 30–40 so'zdan iborat har xil matnlar va Excel hisoboti")
+    st.caption("Har bir bobda 20 ta so'z, audio talaffuz, yozma mashqlar, 30–40 so'zdan iborat matnlar va to'liq Excel hisoboti")
 
     bob_nomlari = [f"{i}-Bob" for i in range(1, 51)]
     tanlangan_bob = st.sidebar.selectbox("O'rganish uchun Bobni tanlang:", bob_nomlari)
@@ -274,6 +261,12 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
 
     with tab4:
         st.subheader(f"📝 {tanlangan_bob} bo'yicha 20 ta so'zlik to'liq test")
+        
+        # Test natijasini xotirada saqlash uchun kalit
+        res_key = f"quiz_result_{bob_raqami}"
+        if res_key not in st.session_state:
+            st.session_state[res_key] = None
+
         with st.form(f"test_form_all_{bob_raqami}"):
             col_ism, col_sinf = st.columns(2)
             with col_ism:
@@ -298,7 +291,7 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                     audio_button(q['en'])
                 tanlovlar.append((q, ans))
                 
-            yakunlash = st.form_submit_button("Testni topshirish va Excel olish 🎯")
+            yakunlash = st.form_submit_button("Testni topshirish va natijani hisoblash 🎯")
             if yakunlash:
                 if ism.strip() and sinf.strip():
                     detallar = []
@@ -314,50 +307,58 @@ if asosiy_menyu == "📖 1000 ta so'z (50 ta Bob)":
                             "O'quvchi tanlovi": user_a,
                             "Holati": "To'g'ri" if is_correct else "Xato"
                         })
-                    
                     jami = len(hozirgi_sozlar)
                     xato_soni = jami - togri_soni
                     ball = int((togri_soni / jami) * 100)
                     
-                    st.balloons()
-                    st.success("🎉 Test topshirildi va barcha javoblar kompilyatsiya qilindi!")
-                    
-                    c1, c2, c3 = st.columns(3)
-                    c1.metric("To'g'ri", f"{togri_soni} ta")
-                    c2.metric("Xato", f"{xato_soni} ta")
-                    c3.metric("To'plangan ball", f"{ball} / 100")
-                    
-                    df_detal = pd.DataFrame(detallar)
-                    st.dataframe(df_detal, use_container_width=True)
-                    
-                    hozirgi_vaqt = datetime.now().strftime("%Y-%m-%d %H:%M")
-                    xulosa_data = {
-                        "O'quvchi": [ism],
-                        "Sinf": [sinf],
-                        "Bob": [tanlangan_bob],
-                        "Jami": [jami],
-                        "To'g'ri": [togri_soni],
-                        "Xato": [xato_soni],
-                        "Ball": [ball],
-                        "Sana": [hozirgi_vaqt],
-                        "Tuzuvchi": ["Quljanova Shukurjon Zaribovna"]
+                    st.session_state[res_key] = {
+                        "ism": ism, "sinf": sinf, "togri": togri_soni, 
+                        "xato": xato_soni, "ball": ball, "jami": jami,
+                        "detallar": detallar
                     }
-                    df_xulosa = pd.DataFrame(xulosa_data)
-                    
-                    excel_buffer = BytesIO()
-                    with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-                        df_xulosa.to_excel(writer, index=False, sheet_name='Umumiy_Xulosa')
-                        df_detal.to_excel(writer, index=False, sheet_name='20ta_Savol_Batafsil')
-                    excel_data = excel_buffer.getvalue()
-                    
-                    st.download_button(
-                        label="📥 Barcha javoblar kompilyatsiyasini Excel (.xlsx) da yuklab olish",
-                        data=excel_data,
-                        file_name=f"{ism}_{tanlangan_bob}_kompilyatsiya.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
                 else:
                     st.error("Iltimos, ism va sinfingizni kiriting!")
+
+        # FORMADAN TASHQARIDA NATIJA VA EXCEL YUKLASH TUGMASI (XATONI OLDINI OLISH UCHUN)
+        if st.session_state[res_key] is not None:
+            r = st.session_state[res_key]
+            st.balloons()
+            st.success("🎉 Test topshirildi va barcha javoblar kompilyatsiya qilindi!")
+            
+            c1, c2, c3 = st.columns(3)
+            c1.metric("To'g'ri", f"{r['togri']} ta")
+            c2.metric("Xato", f"{r['xato']} ta")
+            c3.metric("To'plangan ball", f"{r['ball']} / 100")
+            
+            df_detal = pd.DataFrame(r["detallar"])
+            st.dataframe(df_detal, use_container_width=True)
+            
+            hozirgi_vaqt = datetime.now().strftime("%Y-%m-%d %H:%M")
+            xulosa_data = {
+                "O'quvchi": [r["ism"]],
+                "Sinf": [r["sinf"]],
+                "Bob": [tanlangan_bob],
+                "Jami": [r["jami"]],
+                "To'g'ri": [r["togri"]],
+                "Xato": [r["xato"]],
+                "Ball": [r["ball"]],
+                "Sana": [hozirgi_vaqt],
+                "Tuzuvchi": ["Quljanova Shukurjon Zaribovna"]
+            }
+            df_xulosa = pd.DataFrame(xulosa_data)
+            
+            excel_buffer = BytesIO()
+            with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+                df_xulosa.to_excel(writer, index=False, sheet_name='Umumiy_Xulosa')
+                df_detal.to_excel(writer, index=False, sheet_name='20ta_Savol_Batafsil')
+            excel_data = excel_buffer.getvalue()
+            
+            st.download_button(
+                label="📥 Barcha javoblar kompilyatsiyasini Excel (.xlsx) da yuklab olish",
+                data=excel_data,
+                file_name=f"{r['ism']}_{tanlangan_bob}_kompilyatsiya.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
     with tab5:
         st.subheader(f"📖 {tanlangan_bob} Matni (30–40 so'zdan iborat)")
